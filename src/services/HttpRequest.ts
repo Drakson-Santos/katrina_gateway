@@ -4,16 +4,18 @@ class AxiosRequest {
 
     private _axiosInstance: any;
 
-    constructor(baseURL: string, headers: any) {
+    constructor(baseURL: string, headers: any, query?: any) {
         this._axiosInstance = axios.create({
             baseURL: baseURL,
             headers: headers,
             params: {},    
+            query: query || {}
         });
+        
     }
 
     async get(url: string) {
-        return await this._axiosInstance.get(url);
+        return await this._axiosInstance.get(urls);
     }
 
     async post(url: string, data: any) {
@@ -43,9 +45,10 @@ export class HttpRequest {
         if (headers) this.headers = headers;
     }
 
-    async get(url: string) {
+    async get(url: string, query?: any) {
+        console.log(query)
         return await new AxiosRequest(`http://${this.hostname}:${this.port}`,
-            this.headers).get(url);
+            this.headers, query).get(url);
     }
 
 }
