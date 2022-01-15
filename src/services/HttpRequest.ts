@@ -15,14 +15,11 @@ class AxiosRequest {
             headers: this.headers,
             params: query || {},
         });
-        
     }
 
     async get(url: string) {
         return await this._axiosInstance.get(url, {
-            params: {
-                ...this._axiosInstance.defaults.params,
-            }
+            params: { ...this._axiosInstance.defaults.params }
         });
     }
 
@@ -50,7 +47,8 @@ export class HttpRequest {
     }
 
     async get(url: string, query?: any) {
-        return await new AxiosRequest(`http://${this.hostname}:${this.port}`, query).get(url);
+        return await new AxiosRequest(`http://${this.hostname}:${this.port}`, {}, query)
+            .get(url);
     }
 
 }
