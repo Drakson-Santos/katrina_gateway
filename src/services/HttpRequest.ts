@@ -1,63 +1,51 @@
-const http = require('http');
+const axios = require('axios');
 
-class Http {
+class AxiosRequest {
 
-    getDataResponse(request: any, data_request: any): any {
-        request.setEncoding('utf8');
-        let rawData = '';
-        request.on('data', (chunk: any) => { rawData += chunk; });
-        request.on('end', () => {
-            try {
-                const parsedData = JSON.parse(rawData);
-                data_request.callback(parsedData);
-            } catch (e) {
-                console.error(e.message);
-            }
+    private _axiosInstance: any;
+
+    constructor(baseURL: string, headers: any) {
+        this._axiosInstance = axios.create({
+            baseURL: baseURL,
+            headers: headers,
+            params: {},    
         });
-        return rawData;
     }
 
-    get(data_request: any) {
-        http.get({
-        hostname: data_request.hostname,
-        port: data_request.port,
-        path: data_request.path,
-        agent: false,
-        headers: data_request.headers
-      }, (res: any) => {     
-        return this.getDataResponse(res, data_request);
-      });
+    async get(url: string) {
+        return await this._axiosInstance.get(url);
+    }
+
+    async post(url: string, data: any) {
+        return await this._axiosInstance.post(url, data);
+    }
+
+    async put(url: string, data: any) {
+        return await this._axiosInstance.put(url, data);
+    }
+
+    async delete(url: string) {
+        return await this._axiosInstance.delete(url);
     }
 }
 
 export class HttpRequest {
-    private _hostname: string;
-    private _port: number;
-    private _path: string;
-    private _headers: any = {
-        'Content-Type': 'application/json'
+    private hostname: string;
+    private port: number;
+    private headers: any = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
     };
 
-    constructor(hostname: string, port: number, path: string, headers?: any) {
-        this._hostname = hostname;
-        this._port = port;
-        this._path = path;
-        if (headers) this._headers = headers;
+    constructor(hostname: string, port: number, headers?: any) {
+        this.hostname = hostname;
+        this.port = port;
+        if (headers) this.headers = headers;
     }
 
-    public async get(): Promise<any> {
-        const http_request = new Http();
-        return new Promise((resolve, reject) => {
-            const data_request = {
-                hostname: this._hostname,
-                port: this._port,
-                path: this._path,
-                headers: this._headers,
-                callback: (data: any) => {
-                    resolve(data);
-                }
-            };
-            http_request.get(data_request);
-        });
+    async get(url: string) {
+        return await new AxiosRequest(`http://${this.hostname}:${this.port}`,
+            this.headers).get(url);
     }
+
 }
