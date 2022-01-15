@@ -7,7 +7,6 @@ import { HttpRequest } from "../../../services/HttpRequest";
 
 router.get("", async (req: Request, res: Response) => {
     const { query } = req;
-    
     const httpRequest = new HttpRequest(KATRINA_USERS.hostname, KATRINA_USERS.port);
     await httpRequest.get(KATRINA_USERS.paths.USERS, query).then((result: any) => {
         const { data, status } = result;

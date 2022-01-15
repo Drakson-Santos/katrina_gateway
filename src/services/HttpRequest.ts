@@ -3,19 +3,27 @@ const axios = require('axios');
 class AxiosRequest {
 
     private _axiosInstance: any;
+    private headers: any = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    };
 
-    constructor(baseURL: string, headers: any, query?: any) {
+    constructor(baseURL: string, headers?: any, query?: any) {
+        if (headers) this.headers = headers;
         this._axiosInstance = axios.create({
             baseURL: baseURL,
-            headers: headers,
-            params: {},    
-            query: query || {}
+            headers: this.headers,
+            params: query || {},
         });
         
     }
 
     async get(url: string) {
-        return await this._axiosInstance.get(urls);
+        return await this._axiosInstance.get(url, {
+            params: {
+                ...this._axiosInstance.defaults.params,
+            }
+        });
     }
 
     async post(url: string, data: any) {
@@ -29,26 +37,20 @@ class AxiosRequest {
     async delete(url: string) {
         return await this._axiosInstance.delete(url);
     }
+
 }
 
 export class HttpRequest {
     private hostname: string;
     private port: number;
-    private headers: any = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    };
 
-    constructor(hostname: string, port: number, headers?: any) {
+    constructor(hostname: string, port: number) {
         this.hostname = hostname;
         this.port = port;
-        if (headers) this.headers = headers;
     }
 
     async get(url: string, query?: any) {
-        console.log(query)
-        return await new AxiosRequest(`http://${this.hostname}:${this.port}`,
-            this.headers, query).get(url);
+        return await new AxiosRequest(`http://${this.hostname}:${this.port}`, query).get(url);
     }
 
 }
